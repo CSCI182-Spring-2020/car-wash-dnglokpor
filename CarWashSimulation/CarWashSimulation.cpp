@@ -39,8 +39,6 @@ int main()
 
     // UI
     cout << "CAR WASH SIMULATION PROGRAM:" << endl;
-
-    // get operation time and client probability
     cout << "For how long (in hours) should we simulate operation? ";
     cin >> operationDuration.hours;
     cout << "What is the probability of car coming in? ";
@@ -122,8 +120,8 @@ int main()
     // display results
     cout << endl << "SIMULATION RESULTS:" << endl;
     cout << "Duration: " << operationDuration.hours <<
-        "\t|Probability of cars: " << inputCarProb << "%" << endl;
-    cout << endl << "Washed " << washedCars << " cars." << endl;
+        "\t|Probability of cars: " << inputCarProb << "%" << endl << endl;
+    
     if (washedCars != 0) {
         cout << "Car no.|\t" << "Arrived|\t\t" << "Wait|\t" << "Left|" << endl;
         int i = 0;
@@ -142,10 +140,9 @@ int main()
             cout << endl;
         }
     }
-    cout << endl << "Average wait time: "; avgWaitTime.display();
-    cout << endl << endl << "Number of unwashed cars: " << unwashedCars << endl;
+   
     if (unwashedCars != 0) {
-        cout << "Car no.|\t" << "Arrived|\t\t" << "Wait|\t" << "Left|" << endl;
+        cout << endl << "Car no.|\t" << "Arrived|\t\t" << "Wait|\t" << "Left|" << endl;
         
         int i = 0;
         IntTime displayTime;
@@ -163,6 +160,9 @@ int main()
             cout << endl;
         }
     }
+    cout << endl << "Washed " << washedCars << " cars." << endl;
+    cout << "Average wait time: "; avgWaitTime.display();
+    cout << endl << "Number of cars left in line : " << unwashedCars << endl;
     cout << endl << endl << "END OF SIMULATION." << endl;
 }
 
