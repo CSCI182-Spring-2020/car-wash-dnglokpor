@@ -10,14 +10,20 @@ v2.0 4/6/2020
 
 #include <iostream>
 #include <time.h>
+#include <stdexcept> // for runtime_error management
 #include "SimpleList.h"
 #include "IntTime.h"
 #define WASH_TIME 3 // time needed to wash a car
 using namespace std;
 
-// signatures
+// fore declarations
 bool newCarIn(int prob);
 bool isOpen4Business(IntTime elapsedTime, IntTime operationTime);
+
+// exception
+struct DivByZero : public runtime_error {
+    DivByZero() : runtime_error("Math error: Attempted division by Zero\n"){}
+};
 
 int main()
 {
@@ -57,7 +63,7 @@ int main()
         elapsedTime.tick();
 
         // check for incoming car every minute
-        if (elapsedTime.secs == 0) { // a minute has passed
+        //if (elapsedTime.secs == 0) { // a minute has passed
             if (newCarIn(inputCarProb)) { // a new car came in
                 // add car to waiting list
                 // since the nodes can only store seconds then we convert time to seconds first
@@ -66,7 +72,7 @@ int main()
                 elapsedTime.display();
                 cout << "\t" << " A car came in" << endl;
             }
-        }
+        //}
 
         // wash car or wait for the washroom to be free
         if (washRoomIsFree) {
@@ -113,17 +119,29 @@ int main()
     }
     washedCars = processedOutTimes.length();
     unwashedCars = processingWaitTimes.length();
-    avgWaitTime.secs = processedWaitTimes.totalWaitTime(); // get total wait time in secs
-    avgWaitTime.secs = avgWaitTime.secs / washedCars; // take integer average
+    // get total wait time in secs including wait time of cars that haven't been washed
+    avgWaitTime.secs = processedWaitTimes.totalWaitTime() +
+        processingWaitTimes.totalWaitTime();
+    // case of no cars exception handling
+    try{
+        if (washedCars == 0 && unwashedCars == 0)
+            throw DivByZero();
+        else
+            avgWaitTime.secs = avgWaitTime.secs / (washedCars + unwashedCars); // we consider all the cars for the average
+    }
+    catch (DivByZero& nWashedCarsNull) {
+        avgWaitTime.secs = 0;
+    }
     avgWaitTime.update(); // reformat
 
     // display results
     cout << endl << "SIMULATION RESULTS:" << endl;
     cout << "Duration: " << operationDuration.hours <<
-        "\t|Probability of cars: " << inputCarProb << "%" << endl << endl;
+        "h\t|Probability of cars: " << inputCarProb << "%" << endl << endl;
     
+    cout << "Washed cars:" << endl;
     if (washedCars != 0) {
-        cout << "Car no.|\t" << "Arrived|\t\t" << "Wait|\t" << "Left|" << endl;
+        cout << "Car no.|\t" << "Arrived|\t" << "Wait|\t\t" << "Left|" << endl;
         int i = 0;
         IntTime displayTime;
         while (!processedOutTimes.isEmpty()) {
@@ -141,8 +159,9 @@ int main()
         }
     }
    
+    cout << endl << "Left in line:" << endl;
     if (unwashedCars != 0) {
-        cout << endl << "Car no.|\t" << "Arrived|\t\t" << "Wait|\t" << "Left|" << endl;
+        cout << "Car no.|\t" << "Arrived|\t" << "Wait|\t\t" << "Left|" << endl;
         
         int i = 0;
         IntTime displayTime;
